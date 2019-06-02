@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pandas as pd, numpy as np, nltk
 from nltk import sent_tokenize
-from nltk.stem import PorterStemmer
+from nltk.stem import SnowballStemmer
 from nltk.tokenize.toktok import ToktokTokenizer
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import CountVectorizer
@@ -35,8 +35,9 @@ Aqui se comienza a aplicar la tokenizacion
 remover stopwords y procesamiento de
 malas palabras
 '''
+stemmer = SnowballStemmer('spanish')
 
-def remove_badword_stopwords(log):
+def preprocesing(log):
     '''
     Funcion encargada de remover
     las malas palabras
@@ -46,26 +47,20 @@ def remove_badword_stopwords(log):
         if word in badwords:
             log_remove.append('MALAPALABRA')
         elif word not in stop_words:
+            # log_remove.append(stemmer.stem(word))
             log_remove.append(word)
     return log_remove
 
 tweets_df['log'] = tweets_df.apply(lambda tweets_df: nltk.word_tokenize(tweets_df['log'].lower()), axis=1)
-tweets_df['log'] = tweets_df['log'].apply(lambda log: remove_badword_stopwords(log))
+tweets_df['log'] = tweets_df['log'].apply(lambda log: preprocesing(log))
+tweets_df['log'] = tweets_df['log'].apply(lambda log: [word for word in log if not word.isdigit()])
 
 '''
 vectorize df
 '''
 vectorize = CountVectorizer(lowercase=False, tokenizer=(lambda arg: arg), preprocessor=None)
 data_features = vectorize.fit_transform(tweets_df['log'])
-
-# print all the words that are include on the df
 # print(vectorize.vocabulary_)
-
-# summarize encoded vector
-# print(data_features.shape)
-# print()
-# print(data_features.toarray())
-# print()
 
 '''
 Train test split
@@ -77,9 +72,13 @@ X_train, X_test, Y_train, Y_test = train_test_split(data_features, data_labels, 
 '''
 Using MultinomialNB model
 '''
-
 clf = MultinomialNB()
 clf.fit(X_train, Y_train)
 
 score = clf.score(X_test, Y_test)
 print(score)
+
+'''
+Aqui es donde se procesaron los datos que tienen
+mas informacion
+'''
