@@ -27,7 +27,7 @@ stop_words = set(stopwords.words('spanish'))
 
 with open('badwords.txt', 'r') as file:
     malas_palabras = (file.read().replace('\n', '')).lower().split(',')
-    
+
 badwords = set(malas_palabras)
 
 '''
@@ -52,5 +52,34 @@ def remove_badword_stopwords(log):
 tweets_df['log'] = tweets_df.apply(lambda tweets_df: nltk.word_tokenize(tweets_df['log'].lower()), axis=1)
 tweets_df['log'] = tweets_df['log'].apply(lambda log: remove_badword_stopwords(log))
 
-print(tweets_df.head(20))
-print('')
+'''
+vectorize df
+'''
+vectorize = CountVectorizer(lowercase=False, tokenizer=(lambda arg: arg), preprocessor=None)
+data_features = vectorize.fit_transform(tweets_df['log'])
+
+# print all the words that are include on the df
+# print(vectorize.vocabulary_)
+
+# summarize encoded vector
+# print(data_features.shape)
+# print()
+# print(data_features.toarray())
+# print()
+
+'''
+Train test split
+'''
+data_labels = tweets_df['positivo_negativo'].values
+
+X_train, X_test, Y_train, Y_test = train_test_split(data_features, data_labels, test_size=0.3)
+
+'''
+Using MultinomialNB model
+'''
+
+clf = MultinomialNB()
+clf.fit(X_train, Y_train)
+
+score = clf.score(X_test, Y_test)
+print(score)
