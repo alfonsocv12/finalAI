@@ -12,7 +12,7 @@ from sklearn.naive_bayes import MultinomialNB, GaussianNB, ComplementNB, Bernoul
 tweets_df = pd.read_csv('AMLO.csv',index_col=None, na_values=['NA'])
 tweets_df = tweets_df.drop(['id'],axis=1)
 
-tweets_df_moreinfo = pd.read_csv('TAGS.csv', index_col=None, na_values=['NA'])
+tweets_df_moreinfo = pd.read_csv('tags_varias_fechas.csv', index_col=None, na_values=['NA'])
 
 #Part dedicated to show df
 # print(tweets_df.head(20))
@@ -79,8 +79,8 @@ clf = MultinomialNB()
 
 clf.fit(X_train, Y_train)
 
-# score = clf.score(X_test,Y_test)
-# print(score,'\n')
+score = clf.score(X_test,Y_test)
+print(score,'\n')
 
 '''
 Aqui es donde se procesaron los datos que tienen
@@ -96,7 +96,7 @@ tweets_df_moreinfo = tweets_df_moreinfo.dropna(subset=['log','user_lang'])
 
 # print(tweets_df_moreinfo.head(20),'\n')
 # print(tweets_df_moreinfo.describe(),'\n')
-# # print(tweets_df_moreinfo.apply(lambda x: x.isnull().any()),'\n')
+# print(tweets_df_moreinfo.apply(lambda x: x.isnull().any()),'\n')
 # print(pd.DataFrame({'percent_missing': tweets_df_moreinfo.isnull().sum() * 100 / len(tweets_df_moreinfo)}),'\n')
 # print(pd.DataFrame({'percent_unique': tweets_df_moreinfo.apply(lambda log: log.unique().size/log.size*100)}),'\n')
 
@@ -122,4 +122,4 @@ predictions = clf.predict(data_features_2)
 tweets_df_moreinfo = tweets_df_moreinfo.drop(['user_lang','log_proces'], axis=1)
 tweets_df_moreinfo['positivo_negativo'] = predictions
 # print(data_frame2.head(20),'\n')
-# tweets_df_moreinfo.to_csv(path_or_buf='newdf.csv')
+tweets_df_moreinfo.to_csv(path_or_buf='newdf.csv')
